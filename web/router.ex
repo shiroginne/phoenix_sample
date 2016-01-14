@@ -1,6 +1,8 @@
 defmodule Rumbl.Router do
   use Rumbl.Web, :router
 
+  import Rumbl.Auth, only: [authenticate_user: 2]
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -20,6 +22,12 @@ defmodule Rumbl.Router do
     get "/", PageController, :index
     resources "users", UserController, only: [:index, :new, :show, :create]
     resources "sessions", SessionController, only: [:new, :create, :delete]
+  end
+
+  scope "/manage", Rumbl do
+    pipe_through [:browser, :authenticate_user]
+
+    resources "/videos", VideoController
   end
 
   # Other scopes may use custom stacks.
